@@ -78,11 +78,13 @@ if __name__ == '__main__':
     else:
         print("Error, incorrect arguments, Usage:", sys.argv[0], "inputFileName [outputFileNameCircles [outputFileNamePoints]]")
         sys.exit(1)
-    
+
 
     polygons = parseData(sys.argv[1])
     for polygon in polygons:
-        circle = polylabel(polygon[0], precision=0.001, with_distance=True)
+        # circle is formatted as [[x,y,z],radius]
+        circle = list(polylabel(polygon[0], precision=0.001, with_distance=True))
+        circle[1] *= 2.0  # polylabel gives the radius of the circle, we want the diameter
         circle[0].append(sum(polygon[1])/len(polygon[1]))
         circles.append(circle)
 
