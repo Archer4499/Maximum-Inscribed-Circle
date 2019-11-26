@@ -3,8 +3,9 @@
 # Requires Python 3.6 and above
 
 import sys
-from polylabel import polylabel
 from math import pi, sin, cos
+from polylabel import polylabel
+from ezdxf.r12writer import r12writer
 
 
 def parseData(fileName):
@@ -47,18 +48,50 @@ def parseData(fileName):
     return polygons
 
 
-def output(circles, outFileNameCircles, outFileNamePoints):
-    circleSections = 16
+def outputDXF(circles, outFileNameDXF):
+    # Change these to choose whether to draw the line/label
+    drawLine = True
+    drawLabel = True
 
+    try:
+        with r12writer(outFileNameDXF) as dxf:
+            for circle in circles:
+                dxf.add_circle(circle[0], radius=circle[1])
+
+                x1 = circle[0][0] + circle[1]
+                x2 = circle[0][0] - circle[1]
+                y = circle[0][1]
+                z = circle[0][2]
+                
+                # Draw the diameter line
+                if drawLine:
+                    dxf.add_line((x1, y, z), (x2, y, z))
+                
+                # Add a diameter label
+                if drawLabel:
+                    diameter = circle[1] * 2.0  # polylabel gives the radius of the circle, we want the diameter
+                    lineCentre = [(x2-x1)/2.0 + x1, y + 0.2, z]  # Centre of the line with a slight offset
+                    dxf.add_text(f"{diameter:.2f}", lineCentre, align="CENTER")
+    except OSError:
+        print("Error, could not write to output file:", outFileNameDXF)
+        sys.exit(1)
+
+
+def outputCircles(circles, outFileNameCircles):
     try:
         with open(outFileNameCircles, "w") as f:
             for circle in circles:
+                diameter = circle[1] * 2.0  # polylabel gives the radius of the circle, we want to print the diameter
                 # Output to 2 decimal places
-                output = f"{circle[0][0]:.2f},{circle[0][1]:.2f},{circle[0][2]:.2f},{circle[1]:.2f}\n"
+                output = f"{circle[0][0]:.2f},{circle[0][1]:.2f},{circle[0][2]:.2f},{diameter:.2f}\n"
                 f.write(output)
     except OSError:
         print("Error, could not write to output file:", outFileNameCircles)
         sys.exit(1)
+
+
+def outputPoints(circles, outFileNamePoints):
+    circleSections = 16
 
     if outFileNamePoints:
         try:
@@ -83,16 +116,37 @@ if __name__ == '__main__':
     circles = []
 
     if len(sys.argv) == 2:
-        outFileNameCircles = "circles.csv"
-        outFileNamePoints = "points.csv"
+        mode = 0
+        outFileName = "circles.dxf"
     elif len(sys.argv) == 3:
-        outFileNameCircles = sys.argv[2]
-        outFileNamePoints = ""
+        modeName = sys.argv[2]
+        if modeName == "d":
+            mode = 0
+            outFileName = "circles.dxf"
+        elif modeName == "c":
+            mode = 1
+            outFileName = "circles.csv"
+        elif modeName == "p":
+            mode = 2
+            outFileName = "points.csv"
+        else:
+            print("Error, incorrect mode, Usage:", sys.argv[0], "inputFileName [d|c|p [outputFileName]]")
+            sys.exit(1)
     elif len(sys.argv) == 4:
-        outFileNameCircles = sys.argv[2]
-        outFileNamePoints = sys.argv[3]
+        modeName = sys.argv[2]
+        if modeName == "d":
+            mode = 0
+        elif modeName == "c":
+            mode = 1
+        elif modeName == "p":
+            mode = 2
+        else:
+            print("Error, incorrect mode, Usage:", sys.argv[0], "inputFileName [d|c|p [outputFileName]]")
+            sys.exit(1)
+
+        outFileName = sys.argv[3]
     else:
-        print("Error, incorrect arguments, Usage:", sys.argv[0], "inputFileName [outputFileNameCircles [outputFileNamePoints]]")
+        print("Error, incorrect arguments, Usage:", sys.argv[0], "inputFileName [d|c|p [outputFileName]]")
         sys.exit(1)
 
 
@@ -100,8 +154,12 @@ if __name__ == '__main__':
     for polygon in polygons:
         # circle is formatted as [[x,y,z],radius]
         circle = list(polylabel(polygon[0], precision=0.001, with_distance=True))
-        circle[1] *= 2.0  # polylabel gives the radius of the circle, we want the diameter
         circle[0].append(sum(polygon[1])/len(polygon[1]))
         circles.append(circle)
 
-    output(circles, outFileNameCircles, outFileNamePoints)
+    if mode == 0:
+        outputDXF(circles, outFileName)
+    elif mode == 1:
+        outputCircles(circles, outFileName)
+    elif mode == 2:
+        outputPoints(circles, outFileName)
