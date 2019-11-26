@@ -4,11 +4,13 @@ Outputs the co-ordinates and radius (and optionally points of the circle) of a m
 
 ## Getting Started:
 
-Either download and extract the repository zip file or just main.py and polylabel.py and run the following in a console, using the test data:
+Either download and extract the repository zip file or just main.py and polylabel.py and run the following in a console to use the example data:
 ```
 python3 main.py exampleData.csv circles.csv points.csv
 ```
-The expected data format for the input is the following, with an empty line seperating each polygon:
+If just the input filename is given it will output the data to files named `circles.csv` and `points.csv`. If the first output file name is also given it will output the center point and radius of each maximum inscribed circle to the given output filename. And if both output names are given it will also output the points defining the a 16-sided polygon (can easily be changed at the top of the output function in the main.py file) approximation of each maximum inscribed circle to the second given output filename.
+
+The expected input is a csv file with an blank line seperating each polygon, in the following format:
 ```
 poly1Point1X,poly1Point1Y,poly1Point1Z
 poly1Point2X,poly1Point2Y,poly1Point2Z
@@ -27,7 +29,7 @@ circle2X,circle2Y,circle2Z,circle2Radius
 circle3X,circle3Y,circle3Z,circle3Radius
 ```
 
-The second (points) file contains the points defining each maximum inscribed circle in the following format, with an empty line seperating each circle:
+The optinal second (points) output file contains the points defining each maximum inscribed circle in the following format, with an blank line seperating each circle:
 ```
 circle1X,circle1Y,circle1Z,circle1Radius
 circle2X,circle2Y,circle2Z,circle2Radius
