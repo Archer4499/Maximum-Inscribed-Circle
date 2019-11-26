@@ -4,6 +4,8 @@ Outputs the co-ordinates and radius (and optionally points of the circle) of a m
 
 ## Getting Started:
 
+Requires Python 3.6 or above.
+
 Either download and extract the repository zip file or just main.py and polylabel.py (and optionally exampleData.csv), and run the following in a console to use the example data:
 ```
 python3 main.py exampleData.csv circles.csv points.csv
