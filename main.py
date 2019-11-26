@@ -21,6 +21,9 @@ def parseData(fileName):
             for line in f:
                 if line.strip() == "":
                     if points:
+                        if len(points) < 3:
+                            print("Error, not enough points in one of the polygons in:", fileName)
+                            sys.exit(1)
                         polygons.append([points, elevations])
                     points = []
                     elevations = []
@@ -29,6 +32,9 @@ def parseData(fileName):
                     points.append(point[0:2])
                     elevations.append(point[2])
             if points:
+                if len(points) < 3:
+                            print("Error, not enough points in one of the polygons in:", fileName)
+                            sys.exit(1)
                 polygons.append([points, elevations])
     except OSError:
         print("Error, could not open input file:", fileName)
