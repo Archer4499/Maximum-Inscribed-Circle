@@ -1,10 +1,18 @@
 #!/usr/bin/env python3
+
+# Requires Python 3.6 and above
+
 import sys
 from polylabel import polylabel
 from math import pi, sin, cos
 
 
 def parseData(fileName):
+    # Parses data from the file fileName of the format:
+        # poly1Point1X,poly1Point1Y,poly1Point1Z
+        # poly1Point2X,poly1Point2Y,poly1Point2Z
+        #
+        # poly2Point1X,poly2Point1Y,poly2Point1Z
     polygons = []
     try:
         with open(fileName, "r") as f:
@@ -29,9 +37,6 @@ def parseData(fileName):
     if not polygons:
         print("Error, no polygons found in file:", fileName)
         sys.exit(1)
-    # print(points)
-    # print()
-    # print(avgElvations)
 
     return polygons
 
@@ -42,7 +47,9 @@ def output(circles, outFileNameCircles, outFileNamePoints):
     try:
         with open(outFileNameCircles, "w") as f:
             for circle in circles:
-                f.write(str(circle[0][0])+","+str(circle[0][1])+","+str(circle[0][2])+","+str(circle[1])+"\n")
+                # Output to 2 decimal places
+                output = f"{circle[0][0]:.2f},{circle[0][1]:.2f},{circle[0][2]:.2f},{circle[1]:.2f}\n"
+                f.write(output)
     except OSError:
         print("Error, could not write to output file:", outFileNameCircles)
         sys.exit(1)
@@ -51,12 +58,15 @@ def output(circles, outFileNameCircles, outFileNamePoints):
         try:
             with open(outFileNamePoints, "w") as f:
                 for circle in circles:
+                    # For each circle calculate circleSections number of points around it
                     arc = 2 * pi / circleSections
                     for i in range(circleSections):
                         angle = arc * i
-                        newX = circle[0][0] + circle[1]*cos(angle)
-                        newY = circle[0][1] + circle[1]*sin(angle)
-                        f.write(str(newX)+","+str(newY)+","+str(circle[0][2])+"\n")
+                        x = circle[0][0] + circle[1]*cos(angle)
+                        y = circle[0][1] + circle[1]*sin(angle)
+                        # Output to 2 decimal places
+                        output = f"{x:.2f},{y:.2f},{circle[0][2]:.2f}\n"
+                        f.write(output)
                     f.write("\n")
         except OSError:
             print("Error, could not write to output file:", outFileNamePoints)
