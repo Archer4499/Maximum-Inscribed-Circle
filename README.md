@@ -12,7 +12,7 @@ python3 main.py exampleData.csv circles.csv points.csv
 ```
 If just the input filename is given it will output the data to files named `circles.csv` and `points.csv`. If the first output file name is also given it will output the centre point and radius of each maximum inscribed circle to the given output filename. And if both output names are given it will also output the points defining the a 16-sided polygon (can easily be changed at the top of the output function in the main.py file) approximation of each maximum inscribed circle to the second given output filename.
 
-The expected input is a csv file with an blank line separating each polygon, in the following format:
+The expected input is a csv file with a blank line separating each polygon, in the following format:
 ```
 poly1Point1X,poly1Point1Y,poly1Point1Z
 poly1Point2X,poly1Point2Y,poly1Point2Z
@@ -31,11 +31,14 @@ circle2X,circle2Y,circle2Z,circle2Radius
 circle3X,circle3Y,circle3Z,circle3Radius
 ```
 
-The optional second (points) output file contains the points defining each maximum inscribed circle in the following format, with an blank line separating each circle:
+The optional second (points) output file contains the points defining each maximum inscribed circle in the following format, with a blank line separating each circle:
 ```
-circle1X,circle1Y,circle1Z,circle1Radius
-circle2X,circle2Y,circle2Z,circle2Radius
-circle3X,circle3Y,circle3Z,circle3Radius
+circle1Point1X,circle1Point1Y,circle1Point1Z
+circle1Point2X,circle1Point2Y,circle1Point2Z
+circle1Point3X,circle1Point3Y,circle1Point3Z
+
+circle2Point1X,circle2Point1Y,circle2Point1Z
+circle2Point2X,circle2Point2Y,circle2Point2Z
 ```
 
 ### Usage:
