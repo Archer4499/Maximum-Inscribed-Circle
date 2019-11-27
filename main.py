@@ -262,7 +262,7 @@ class Gui(Tk):
             with r12writer(outFileNameDXF) as dxf:
                 for i, circle in enumerate(self.circles):
                     if self.outputDXFCircle.get():
-                        dxf.add_circle(circle[0], radius=circle[1], layer=str(i+1))
+                        dxf.add_circle(circle[0], radius=circle[1], layer="Circle"+str(i))
 
                     x1 = circle[0][0] + circle[1]
                     x2 = circle[0][0] - circle[1]
@@ -271,13 +271,13 @@ class Gui(Tk):
 
                     # Draw the diameter line
                     if self.outputDXFDiameter.get():
-                        dxf.add_line((x1, y, z), (x2, y, z), layer=str(i+1))
+                        dxf.add_line((x1, y, z), (x2, y, z), layer="Circle"+str(i))
 
                     # Add a diameter label
                     if self.outputDXFLabel.get():
                         diameter = circle[1] * 2.0  # polylabel gives the radius of the circle, we want the diameter
                         lineCentre = [(x2-x1)/2.0 + x1, y + 0.2, z]  # Centre of the line with a slight offset
-                        dxf.add_text(f"{diameter:.2f}", lineCentre, align="CENTER", layer=str(i+1))
+                        dxf.add_text(f"{diameter:.2f}", lineCentre, align="CENTER", layer="Circle"+str(i))
 
                     if self.outputDXFPoints.get():
                         pointsNum = int(self.outputPointsNum.get())
@@ -288,7 +288,7 @@ class Gui(Tk):
                             x = circle[0][0] + circle[1]*cos(angle)
                             y = circle[0][1] + circle[1]*sin(angle)
                             z = circle[0][2]
-                            dxf.add_point((x, y, z), layer=str(i+1))
+                            dxf.add_point((x, y, z), layer="Circle"+str(i))
         except OSError:
             messagebox.showerror(title="Error", message=f"Could not write to output file: {outFileNameDXF}")
             return 1
