@@ -4,7 +4,7 @@
 
 from os import chdir
 from math import pi, sin, cos
-from tkinter import *
+from tkinter import *  # pylint: disable=W0401,W0614
 from tkinter import ttk, filedialog, messagebox
 # import threading  # TODO: possibly use
 from ezdxf.r12writer import r12writer
@@ -22,7 +22,7 @@ class MenuBar(Menu):
 
         help_menu = Menu(self)
         help_menu.add_command(label="About",
-                              command=lambda: messagebox.showinfo("About", "v0.1"))
+                              command=lambda: messagebox.showinfo("About", "v1.0"))
 
         self.add_cascade(menu=file_menu, label="File")
         self.add_cascade(menu=help_menu, label="Help")
@@ -50,6 +50,8 @@ class Gui(Tk):
         self.outputDXFLabel.set(0)
         self.outputDXFPoints = IntVar()
         self.outputDXFPoints.set(0)
+        self.outputDXFPolyLines = IntVar()
+        self.outputDXFPolyLines.set(0)
 
         self.outputCircles = IntVar()
         self.outputCircles.set(0)
@@ -125,23 +127,25 @@ class Gui(Tk):
             .grid(column=column+1, row=3, sticky=W, padx=5, pady=0)
         ttk.Checkbutton(parentFrame, text="Output Points in DXF", variable=self.outputDXFPoints)\
             .grid(column=column+1, row=4, sticky=W, padx=5, pady=0)
+        ttk.Checkbutton(parentFrame, text="Output PolyLine in DXF", variable=self.outputDXFPolyLines)\
+            .grid(column=column+1, row=5, sticky=W, padx=5, pady=0)
 
         ttk.Checkbutton(parentFrame, text="Output to Circles csv", variable=self.outputCircles)\
-            .grid(column=column, row=5, columnspan=2, sticky=W, padx=5, pady=5)
-
-        ttk.Checkbutton(parentFrame, text="Output to Points csv", variable=self.outputPoints)\
             .grid(column=column, row=6, columnspan=2, sticky=W, padx=5, pady=5)
 
+        ttk.Checkbutton(parentFrame, text="Output to Points csv", variable=self.outputPoints)\
+            .grid(column=column, row=7, columnspan=2, sticky=W, padx=5, pady=5)
+
         ttk.Label(parentFrame, text="Number of points on circle:")\
-            .grid(column=column, row=7, columnspan=2, sticky=W, padx=5, pady=(5, 0))
+            .grid(column=column, row=8, columnspan=2, sticky=W, padx=5, pady=(5, 0))
         # TODO: disable when neither output points in DXF or output points csv are selected
         self.NumEntry(4, 0, 9999, parentFrame, textvariable=self.outputPointsNum)\
-            .grid(column=column, row=8, columnspan=2, sticky=W, padx=5, pady=0)
+            .grid(column=column, row=9, columnspan=2, sticky=W, padx=5, pady=0)
 
         ttk.Label(parentFrame, text="Output Folder:")\
-            .grid(column=column, row=9, columnspan=2, sticky=W, padx=5, pady=(5, 0))
+            .grid(column=column, row=10, columnspan=2, sticky=W, padx=5, pady=(5, 0))
         ttk.Entry(parentFrame, textvariable=self.outputFolder)\
-            .grid(column=column, row=10, columnspan=2, sticky=(W, E), padx=5, pady=0)
+            .grid(column=column, row=11, columnspan=2, sticky=(W, E), padx=5, pady=0)
 
         self.browseButton = ttk.Button(parentFrame, text="Browse", command=self.browse)
         self.browseButton.grid(column=column, row=14, columnspan=2, padx=5, pady=(5, 0))
@@ -194,18 +198,18 @@ class Gui(Tk):
         PointsFileName = "points.csv"
 
         if not self.outputFolder.get():
-            messagebox.showerror(title="Error", message="Output Folder not set")
+            messagebox.showerror(title="Error", message="Output Folder not set.")
             return
         if self.outputFolder.get()[-1] != "/":
             self.outputFolder.set(self.outputFolder.get()+"/")
 
-        if self.outputPoints.get() or self.outputDXFPoints.get():
+        if self.outputPoints.get() or self.outputDXFPoints.get() or self.outputDXFPolyLines.get():
             if int(self.outputPointsNum.get()) < 3:
                 messagebox.showerror(title="Error", message="Number of points on circle should be greater than 2.")
                 return
 
         if self.outputDXF.get():
-            if self.outputDXFCircle.get() or self.outputDXFDiameter.get() or self.outputDXFLabel.get() or self.outputDXFPoints.get():
+            if self.outputDXFCircle.get() or self.outputDXFDiameter.get() or self.outputDXFLabel.get() or self.outputDXFPoints.get() or self.outputDXFPolyLines.get():
                 self.saveDXF(self.outputFolder.get()+DXFFileName)
             else:
                 messagebox.showerror(title="Error", message="Output to DXF is selected, at least one of the sub options needs to also be selected.")
@@ -278,8 +282,8 @@ class Gui(Tk):
                         lineCentre = [(x2-x1)/2.0 + x1, y + 0.2, z]  # Centre of the line with a slight offset
                         dxf.add_text(f"{diameter:.2f}", lineCentre, align="CENTER", layer="Circle"+str(i))
 
+                    # Points approximating circle
                     if self.outputDXFPoints.get():
-                        # TODO: as polylines?
                         pointsNum = int(self.outputPointsNum.get())
                         # For each circle calculate outputPointsNum number of points around it
                         arc = 2 * pi / pointsNum
@@ -289,6 +293,19 @@ class Gui(Tk):
                             y = circle[0][1] + circle[1]*sin(angle)
                             z = circle[0][2]
                             dxf.add_point((x, y, z), layer="Circle"+str(i))
+
+                    # PolyLines approximating circle
+                    if self.outputDXFPolyLines.get():
+                        pointsNum = int(self.outputPointsNum.get())
+                        # For each circle calculate outputPointsNum number of points around it
+                        arc = 2 * pi / pointsNum
+                        x = circle[0][0]
+                        y = circle[0][1]
+                        z = circle[0][2]
+
+                        points = [(x+circle[1]*cos(arc*j), y+circle[1]*sin(arc*j), z) for j in range(pointsNum)]
+                        points.append(points[0])
+                        dxf.add_polyline(points, layer="Circle"+str(i))
         except OSError:
             messagebox.showerror(title="Error", message=f"Could not write to output file: {outFileNameDXF}")
             return 1
