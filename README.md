@@ -5,17 +5,7 @@ Outputs the co-ordinates and diameter (and optionally points of the circle) of a
 
 ## Getting Started:
 
-Requires Python 3.6 or above.
-
-Run the following in a console to install the required packages:
-```
-python3 -m pip install ezdxf
-```
-
-Either download and extract the repository zip file or just main.py and polylabel.py (and optionally exampleData.csv), and run the following in a console to start the program:
-```
-python3 main.py
-```
+To run on windows download the Maximum-Inscribed-Circle.exe from the [Latest](https://github.com/Archer4499/Maximum-Inscribed-Circle/releases/latest) release and copy to your working folder. For other OSs follow the instructions in [Run python code](#Run-python-code).
 
 The expected input is a csv file with a blank line separating each polygon, in the following format:
 ```
@@ -60,6 +50,32 @@ circle2Point2X,circle2Point2Y,circle2Point2Z
 
 The old console functionality can still be found in the `console-version` branch, if desired.
 
+
+## Run python code
+
+Requires Python 3.6 or above.
+
+Run the following in a console to install the required packages:
+```
+python3 -m pip install ezdxf
+```
+
+Either download and extract the repository zip file or just main.py and polylabel.py (and optionally exampleData.csv), and run the following in a console to start the program:
+```
+python3 main.py
+```
+
+## Build
+
+(Note: as of writing, only works with Python versions 3.6 and 3.7)
+
+To build a windows executable of this program using pyinstaller, run the following commands in a cmd.exe window:
+```
+python -m pip install pyinstaller
+
+pyinstaller -y -F -w --clean -n "Maximum-Inscribed-Circle"  "C:/path/to/main.py"
+```
+
 ---
 ## License
 
@@ -70,3 +86,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 The Pole of Inaccessibility calculation uses code slightly modified by me from a port to python: https://github.com/Twista/python-polylabel of the original algorithm from MapBox: https://github.com/mapbox/polylabel
 
 Uses the exdxf(https://pypi.org/project/ezdxf/) package to write .dxf files.
+
+Uses the pyinstaller(https://pypi.org/project/pyinstaller/) package to create the executable.
