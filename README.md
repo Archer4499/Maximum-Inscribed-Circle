@@ -3,11 +3,6 @@
 Outputs the co-ordinates and diameter (and optionally points of the circle) of a maximum inscribed circle to be contained within a digitized polygon
 
 
-### Usage:
-```
-python3 main.py inputFileName [d|c|p [outputFileName]]
-```
-
 ## Getting Started:
 
 Requires Python 3.6 or above.
@@ -17,19 +12,22 @@ Run the following in a console to install the required packages:
 python3 -m pip install ezdxf
 ```
 
-Either download and extract the repository zip file or just main.py and polylabel.py (and optionally exampleData.csv), and run the following in a console to use the example data and output a `.dxf` file:
+Either download and extract the repository zip file or just main.py and polylabel.py (and optionally exampleData.csv), and run the following in a console to start the program:
 ```
-python3 main.py exampleData.csv
+python3 main.py
 ```
 
-If just the input filename is given it will output a `.dxf` file containing the maximum inscribed circles, a diameter line and a diameter label, called `circles.dxf`
 
-The following modes can be specified and will output to default filenames or to the specified output filename:
-```
-d - Output a dxf file called circles.dxf, containing the maximum inscribed circles, a diameter line and a diameter label.
-c - Output a csv file called circles.csv, containing the centre point and diameter of each maximum inscribed circle.
-p - Output a csv file called points.csv, containing the points defining the a 16-sided polygon (can easily be changed at the top of the output function in the main.py file) approximation of each maximum inscribed circle.
-```
+The following output options can be specified and will output files to the folder specified (The default output folder "./" is the folder that the program is running in):
+* `Output to DXF` will output a file called circles.dxf, containing the , a  and a diameter label.
+    * `Output Circle in DXF` adds the maximum inscribed circles defined as circles to the DXF file.
+    * `Output Diameter Line in DXF` adds diameter lines to the DXF file.
+    * `Output Diameter Label in DXF` adds diameter labels to the DXF file.
+    * `Output Points in DXF` adds the maximum inscribed circles defined as points to the DXF file (Number of points is specified by the `Number of points on circle` box below).
+* `Output to Circles CSV` will output a file called circles.csv, containing the centre point and diameter of each maximum inscribed circle.
+* `Output to Points CSV` will output a file called points.csv, containing the points defining the a 16-sided polygon (can easily be changed at the top of the output function in the main.py file) approximation of each maximum inscribed circle.
+* `Number of points on circle` specifies the number of points used to approximate the circle for both the `Points CSV` and the `Output Points in DXF` outputs.
+
 
 The expected input is a csv file with a blank line separating each polygon, in the following format:
 ```
@@ -43,14 +41,14 @@ poly2Point2X,poly2Point2Y,poly2Point2Z
 poly2Point3X,poly2Point3Y,poly2Point3Z
 ```
 
-The circles output file contains the centre point and diameter of each maximum inscribed circle in the following format:
+The `Circles CSV` output file contains the centre point and diameter of each maximum inscribed circle in the following format:
 ```
 circle1X,circle1Y,circle1Z,circle1Diameter
 circle2X,circle2Y,circle2Z,circle2Diameter
 circle3X,circle3Y,circle3Z,circle3Diameter
 ```
 
-The points output file contains the points defining each maximum inscribed circle in the following format, with a blank line separating each circle:
+The `Points CSV` output file contains the points defining each maximum inscribed circle in the following format, with a blank line separating each circle:
 ```
 circle1Point1X,circle1Point1Y,circle1Point1Z
 circle1Point2X,circle1Point2Y,circle1Point2Z
@@ -60,6 +58,8 @@ circle2Point1X,circle2Point1Y,circle2Point1Z
 circle2Point2X,circle2Point2Y,circle2Point2Z
 ```
 
+
+The old console functionality can still be found in the `console-version` branch, if desired.
 
 ---
 ## License
