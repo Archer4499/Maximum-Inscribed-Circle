@@ -2,7 +2,6 @@
 
 # Requires Python 3.6 and above
 
-import sys
 from os import chdir
 from math import pi, sin, cos
 from tkinter import *
@@ -233,8 +232,8 @@ class Gui(Tk):
                     if line.strip() == "":
                         if points:
                             if len(points) < 3:
-                                print("Error, not enough points in one of the polygons in:", fileName)
-                                sys.exit(1)
+                                messagebox.showerror(title="Error", message=f"Not enough points in one of the polygons in: {fileName}")
+                                return False
                             polygons.append([points, elevations])
                         points = []
                         elevations = []
@@ -244,8 +243,8 @@ class Gui(Tk):
                         elevations.append(point[2])
                 if points:
                     if len(points) < 3:
-                        print("Error, not enough points in one of the polygons in:", fileName)
-                        sys.exit(1)
+                        messagebox.showerror(title="Error", message=f"Not enough points in one of the polygons in: {fileName}")
+                        return False
                     polygons.append([points, elevations])
         except OSError:
             messagebox.showerror(title="Error", message=f"Could not open input file: {fileName}")
@@ -280,6 +279,7 @@ class Gui(Tk):
                         dxf.add_text(f"{diameter:.2f}", lineCentre, align="CENTER", layer="Circle"+str(i))
 
                     if self.outputDXFPoints.get():
+                        # TODO: as polylines?
                         pointsNum = int(self.outputPointsNum.get())
                         # For each circle calculate outputPointsNum number of points around it
                         arc = 2 * pi / pointsNum
