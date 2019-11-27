@@ -19,13 +19,13 @@ python3 main.py
 
 
 The following output options can be specified and will output files to the folder specified (The default output folder "./" is the folder that the program is running in):
-* `Output to DXF` will output a file called circles.dxf, containing the , a  and a diameter label.
+* `Output to DXF` will output a file called `circles.dxf`, containing the , a  and a diameter label.
     * `Output Circle in DXF` adds the maximum inscribed circles defined as circles to the DXF file.
     * `Output Diameter Line in DXF` adds diameter lines to the DXF file.
     * `Output Diameter Label in DXF` adds diameter labels to the DXF file.
     * `Output Points in DXF` adds the maximum inscribed circles defined as points to the DXF file (Number of points is specified by the `Number of points on circle` box below).
-* `Output to Circles CSV` will output a file called circles.csv, containing the centre point and diameter of each maximum inscribed circle.
-* `Output to Points CSV` will output a file called points.csv, containing the points defining the a 16-sided polygon (can easily be changed at the top of the output function in the main.py file) approximation of each maximum inscribed circle.
+* `Output to Circles CSV` will output a file called `circles.csv`, containing the centre point and diameter of each maximum inscribed circle.
+* `Output to Points CSV` will output a file called `points.csv`, containing the points defining the a 16-sided polygon (can easily be changed at the top of the output function in the main.py file) approximation of each maximum inscribed circle.
 * `Number of points on circle` specifies the number of points used to approximate the circle for both the `Points CSV` and the `Output Points in DXF` outputs.
 
 
