@@ -37,7 +37,7 @@ The following output options can be specified and will output files to the folde
     * `Output Points in DXF` adds the maximum inscribed circles approximated as points to the DXF file (Number of points is specified by the `Number of points on circle` box below).
     * `Output PolyLine in DXF` adds the maximum inscribed circles approximated as polylines to the DXF file (Number of points is specified by the `Number of points on circle` box below).
 * `Output to Circles CSV` will output a file called `circles.csv`, containing the centre point and diameter of each maximum inscribed circle.
-* `Output to Points CSV` will output a file called `points.csv`, containing the points defining the a 16-sided polygon (can easily be changed at the top of the output function in the main.py file) approximation of each maximum inscribed circle.
+* `Output to Points CSV` will output a file called `points.csv`, containing the points defining a polygon approximation of each maximum inscribed circle.
 * `Number of points on circle` specifies the number of points used to approximate the circle for both the `Points CSV` and the `Output Points in DXF` outputs.
 
 The `Circles CSV` output file contains the centre point and diameter of each maximum inscribed circle in the following format:
