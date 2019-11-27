@@ -113,8 +113,6 @@ def outputPoints(circles, outFileNamePoints):
 
 
 if __name__ == '__main__':
-    circles = []
-
     if len(sys.argv) == 2:
         mode = 0
         outFileName = "circles.dxf"
@@ -149,6 +147,7 @@ if __name__ == '__main__':
         print("Error, incorrect arguments, Usage:", sys.argv[0], "inputFileName [d|c|p [outputFileName]]")
         sys.exit(1)
 
+    circles = []
 
     polygons = parseData(sys.argv[1])
     for polygon in polygons:
