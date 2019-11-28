@@ -106,7 +106,7 @@ class Gui(Tk):
             return True
 
     def initLoad(self, parentFrame, column):
-        self.loadButton = ttk.Button(parentFrame, text="Open csv file", command=self.load)
+        self.loadButton = ttk.Button(parentFrame, text="Open csv file/s", command=self.load)
         self.loadButton.grid(column=column, row=4)
 
         ttk.Label(parentFrame, text="Number of polygons found in the file:")\
@@ -156,12 +156,13 @@ class Gui(Tk):
 
     def load(self):
         # Bound to loadButton
-        # TODO(Derek): load multiple files at once?
-        fileName = filedialog.askopenfilename(filetypes=[("csv files", "*.csv")])
-        if not fileName:
+        fileNames = filedialog.askopenfilenames(filetypes=[("csv files", "*.csv")])
+        if not fileNames:
             return
 
-        polygons = self.parseData(fileName)
+        polygons = []
+        for fileName in fileNames:
+            polygons.extend(self.parseData(fileName))
         if not polygons:
             return
 
