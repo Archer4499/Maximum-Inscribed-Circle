@@ -224,41 +224,92 @@ class Gui(Tk):
         messagebox.showinfo(title="Success", message="Saved File/s")
 
     def parseData(self, fileName):
-        # Parses data from the file fileName of the format:
+        # Parses data from the file fileName of either a basic csv format:
             # poly1Point1X,poly1Point1Y,poly1Point1Z
             # poly1Point2X,poly1Point2Y,poly1Point2Z
             #
             # poly2Point1X,poly2Point1Y,poly2Point1Z
+        # Or approximately the csv format GEM4D outputs, main requirements are:
+            # At least one line with no numbers separating each polygon
+            # Comma separated values
+            # 3 consecutive numbers on each polygon line interpreted as x,y,z
         polygons = []
         try:
             with open(fileName, "r") as f:
                 points = []
                 elevations = []
-                for line in f:
-                    if line.strip() == "":
-                        if points:
-                            if len(points) < 3:
-                                messagebox.showerror(title="Error", message=f"Not enough points in one of the polygons in: {fileName}")
-                                return False
-                            polygons.append([points, elevations])
-                        points = []
-                        elevations = []
-                    else:
-                        point = [float(num) for num in line.split(",")]
-                        points.append(point[0:2])
-                        elevations.append(point[2])
-                if points:
-                    if len(points) < 3:
-                        messagebox.showerror(title="Error", message=f"Not enough points in one of the polygons in: {fileName}")
-                        return False
-                    polygons.append([points, elevations])
+
+                firstLine = f.readline()
+                if not firstLine:
+                    messagebox.showerror(title="Error", message=f"Tried reading empty file: {fileName}")
+                    return []
+                # Reset position in file to beginning after reading first line
+                f.seek(0)
+
+                firstToken = firstLine.split(",")[0]
+
+                # Check if the first token is a number, if so then it's probably in basic format
+                try:
+                    float(firstToken)
+                    for line in f:
+                        # If blank line, move onto next polygon
+                        if line.strip() == "":
+                            if points:
+                                if len(points) < 3:
+                                    messagebox.showerror(title="Error", message=f"Not enough points in number {len(polygons)} polygon in file: {fileName}")
+                                    return []
+                                polygons.append([points, elevations])
+                            points = []
+                            elevations = []
+                        else:
+                            point = [float(num) for num in line.split(",")]
+                            points.append(point[0:2])
+                            elevations.append(point[2])
+                    if points:
+                        if len(points) < 3:
+                            messagebox.showerror(title="Error", message=f"Not enough points in number {len(polygons)} polygon in file: {fileName}")
+                            return []
+                        polygons.append([points, elevations])
+                except ValueError:
+                    # If not, check if first token is "DHid", if so then probably GEM4D csv file
+                    # If not, then try to parse as a GEM4D csv file and show warning.
+
+                    if firstToken != "DHid":
+                        messagebox.showwarning(title="Warning", message=f"{fileName} not in recognised format, trying to parse as GEM4D output.")
+
+                    for line in f:
+                        tokens = line.split(",")
+
+                        # Searches the line for a group of 3 consecutive numbers
+                        for i in range(len(tokens)-2):
+                            try:
+                                points.append([float(tokens[i]), float(tokens[i+1])])
+                                elevations.append(float(tokens[i+2]))
+                                break
+                            except ValueError:
+                                continue
+                        else:
+                            # If line is either too short or doesn't contain 3 floats,
+                            #   then it counts as an empty line and we move onto the next polygon
+                            if points:
+                                if len(points) < 3:
+                                    messagebox.showerror(title="Error", message=f"Not enough points in number {len(polygons)} polygon in file: {fileName}")
+                                    return []
+                                polygons.append([points, elevations])
+                            points = []
+                            elevations = []
+                    if points:
+                        if len(points) < 3:
+                            messagebox.showerror(title="Error", message=f"Not enough points in number {len(polygons)} polygon in file: {fileName}")
+                            return []
+                        polygons.append([points, elevations])
         except OSError:
             messagebox.showerror(title="Error", message=f"Could not open input file: {fileName}")
-            return False
+            return []
 
         if not polygons:
             messagebox.showerror(title="Error", message=f"No polygons found in file: {fileName}")
-            return False
+            return []
 
         return polygons
 
