@@ -264,46 +264,46 @@ class Gui(Tk):
         try:
             with r12writer(outFileNameDXF) as dxf:
                 for i, circle in enumerate(self.circles):
-                    if self.outputDXFCircle.get():
-                        dxf.add_circle(circle[0], radius=circle[1], layer="Circle"+str(i))
+                    pointsNum = int(self.outputPointsNum.get())
 
-                    x1 = circle[0][0] + circle[1]
-                    x2 = circle[0][0] - circle[1]
-                    y = circle[0][1]
-                    z = circle[0][2]
+                    centre = circle[0]
+                    radius = circle[1]
+
+                    x = centre[0]
+                    x1 = x + radius
+                    x2 = x - radius
+                    y = centre[1]
+                    z = centre[2]
+
+                    arc = 2 * pi / pointsNum
+
+                    # Draw the circle
+                    if self.outputDXFCircle.get():
+                        dxf.add_circle(centre, radius=radius, layer="Circle"+str(i))
 
                     # Draw the diameter line
                     if self.outputDXFDiameter.get():
                         dxf.add_line((x1, y, z), (x2, y, z), layer="Circle"+str(i))
 
-                    # Add a diameter label
+                    # Draw the diameter label
                     if self.outputDXFLabel.get():
-                        diameter = circle[1] * 2.0  # polylabel gives the radius of the circle, we want the diameter
+                        diameter = radius * 2.0  # polylabel gives the radius of the circle, we want the diameter
                         lineCentre = [(x2-x1)/2.0 + x1, y + 0.2, z]  # Centre of the line with a slight offset
                         dxf.add_text(f"{diameter:.2f}", lineCentre, align="CENTER", layer="Circle"+str(i))
 
-                    # Points approximating circle
+                    # Draw the points approximating circle
                     if self.outputDXFPoints.get():
-                        pointsNum = int(self.outputPointsNum.get())
                         # For each circle calculate outputPointsNum number of points around it
-                        arc = 2 * pi / pointsNum
                         for j in range(pointsNum):
                             angle = arc * j
-                            x = circle[0][0] + circle[1]*cos(angle)
-                            y = circle[0][1] + circle[1]*sin(angle)
-                            z = circle[0][2]
-                            dxf.add_point((x, y, z), layer="Circle"+str(i))
+                            currX = x + radius*cos(angle)
+                            currY = y + radius*sin(angle)
+                            dxf.add_point((currX, currY, z), layer="Circle"+str(i))
 
-                    # PolyLines approximating circle
+                    # Draw the polylines approximating circle
                     if self.outputDXFPolyLines.get():
-                        pointsNum = int(self.outputPointsNum.get())
                         # For each circle calculate outputPointsNum number of points around it
-                        arc = 2 * pi / pointsNum
-                        x = circle[0][0]
-                        y = circle[0][1]
-                        z = circle[0][2]
-
-                        points = [(x+circle[1]*cos(arc*j), y+circle[1]*sin(arc*j), z) for j in range(pointsNum)]
+                        points = [(x+radius*cos(arc*j), y+radius*sin(arc*j), z) for j in range(pointsNum)]
                         points.append(points[0])
                         dxf.add_polyline(points, layer="Circle"+str(i))
         except OSError:
