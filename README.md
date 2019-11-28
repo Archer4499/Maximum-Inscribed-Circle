@@ -55,7 +55,7 @@ The old console functionality can still be found in the `console-version` branch
 
 Requires Python 3.6 or above.
 
-Run the following in a console to install the required packages:
+Run the following in a console to install the required packages (replace `python3` with `python` if using Windows):
 ```
 python3 -m pip install ezdxf
 ```
@@ -69,7 +69,7 @@ python3 main.py
 
 (Note: as of writing, only works with Python versions 3.6 and 3.7)
 
-To build a windows executable of this program using pyinstaller, run the following commands in a cmd.exe window:
+To build a windows executable of this program using pyinstaller, make sure the program is setup and works by following the instructions in [Run python code](#Run-python-code) and then run the following commands in a cmd.exe window:
 ```
 python -m pip install pyinstaller
 
