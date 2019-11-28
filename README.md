@@ -47,6 +47,7 @@ circle2Point1X,circle2Point1Y,circle2Point1Z
 circle2Point2X,circle2Point2Y,circle2Point2Z
 ```
 
+![Alt text](/screenshot.png?raw=true "Screenshot of program")
 
 The old console functionality can still be found in the `console-version` branch, if desired.
 
