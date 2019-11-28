@@ -1,13 +1,13 @@
 # Maximum Inscribed Circle
 
-Outputs the co-ordinates and diameter (and optionally points of the circle) of a maximum inscribed circle to be contained within a digitized polygon
+Reads CSV files from GEM4D and outputs the co-ordinates and diameter (and optionally points of the circle) of a maximum inscribed circle to be contained within a digitized polygon
 
 
 ## Getting Started:
 
-To run on windows download the Maximum-Inscribed-Circle.exe from the [Latest](https://github.com/Archer4499/Maximum-Inscribed-Circle/releases/latest) release and copy to your working folder. For other OSs follow the instructions in [Run python code](#Run-python-code).
+To run on windows download the Maximum-Inscribed-Circle.exe from the [Latest](https://github.com/Archer4499/Maximum-Inscribed-Circle/releases/latest) release and copy to your working folder. For other OSs follow the instructions in [Run python code](#Run-python-code) or [Build](#Build).
 
-The expected input is a csv file with a blank line separating each polygon, in the following format:
+The expected input is a CSV file in either the format that GEM4D exports from closed polylines, or the following simple format with a blank line separating each polygon (Note: also attempts to read other csv files if polygons are separated by non-numerical lines and the first 3 numbers in a line are x,y,z):
 ```
 poly1Point1X,poly1Point1Y,poly1Point1Z
 poly1Point2X,poly1Point2Y,poly1Point2Z
