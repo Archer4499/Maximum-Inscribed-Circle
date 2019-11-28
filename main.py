@@ -156,6 +156,7 @@ class Gui(Tk):
 
     def load(self):
         # Bound to loadButton
+        # TODO(Derek): load multiple files at once?
         fileName = filedialog.askopenfilename(filetypes=[("csv files", "*.csv")])
         if not fileName:
             return
@@ -193,9 +194,10 @@ class Gui(Tk):
 
     def save(self):
         # Bound to saveButton
-        DXFFileName = "circles.dxf"
-        CirclesFileName = "circles.csv"
-        PointsFileName = "points.csv"
+        # TODO(Derek): create folder if not existing?
+        dxfFileName = "circles.dxf"
+        circlesFileName = "circles.csv"
+        pointsFileName = "points.csv"
 
         if not self.outputFolder.get():
             messagebox.showerror(title="Error", message="Output Folder not set.")
@@ -210,14 +212,14 @@ class Gui(Tk):
 
         if self.outputDXF.get():
             if self.outputDXFCircle.get() or self.outputDXFDiameter.get() or self.outputDXFLabel.get() or self.outputDXFPoints.get() or self.outputDXFPolyLines.get():
-                self.saveDXF(self.outputFolder.get()+DXFFileName)
+                self.saveDXF(self.outputFolder.get()+dxfFileName)
             else:
                 messagebox.showerror(title="Error", message="Output to DXF is selected, at least one of the sub options needs to also be selected.")
                 return
         if self.outputCircles.get():
-            self.saveCircles(self.outputFolder.get()+CirclesFileName)
+            self.saveCircles(self.outputFolder.get()+circlesFileName)
         if self.outputPoints.get():
-            self.savePoints(self.outputFolder.get()+PointsFileName)
+            self.savePoints(self.outputFolder.get()+pointsFileName)
 
         messagebox.showinfo(title="Success", message="Saved File/s")
 
