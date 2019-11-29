@@ -3,9 +3,9 @@
 # Requires Python 3.6 and above
 
 from os import chdir, makedirs
-from math import pi, sin, cos
-from tkinter import *  # pylint: disable=W0401,W0614
 from sys import platform
+from math import pi, sin, cos, inf
+import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 # import threading  # TODO: possibly use
 from ezdxf.r12writer import r12writer
@@ -20,16 +20,16 @@ if platform == 'win32':
         pass
 
 
-class MenuBar(Menu):
+class MenuBar(tk.Menu):
     def __init__(self, root, close):
         super().__init__()
 
-        self.option_add("*tearOff", FALSE)
+        self.option_add("*tearOff", False)
 
-        file_menu = Menu(self)
+        file_menu = tk.Menu(self)
         file_menu.add_command(label="Exit", command=close)
 
-        help_menu = Menu(self)
+        help_menu = tk.Menu(self)
         help_menu.add_command(label="About",
                               command=lambda: messagebox.showinfo("About", "v1.0"))
 
@@ -78,39 +78,39 @@ class NumEntry(ttk.Spinbox):
         return True
 
 
-class Gui(Tk):
+class Gui(tk.Tk):
     def __init__(self):
         super().__init__()
 
         self.polygons = []
-        self.numPolygons = IntVar()
+        self.numPolygons = tk.IntVar()
         self.numPolygons.set(0)
         self.circles = []
 
         # Settings
-        self.outputDXF = IntVar()
+        self.outputDXF = tk.IntVar()
         self.outputDXF.set(1)
-        self.outputDXFCircle = IntVar()
+        self.outputDXFCircle = tk.IntVar()
         self.outputDXFCircle.set(0)
-        self.outputDXFDiameter = IntVar()
+        self.outputDXFDiameter = tk.IntVar()
         self.outputDXFDiameter.set(1)
-        self.outputDXFLabel = IntVar()
+        self.outputDXFLabel = tk.IntVar()
         self.outputDXFLabel.set(0)
-        self.outputDXFPoints = IntVar()
+        self.outputDXFPoints = tk.IntVar()
         self.outputDXFPoints.set(0)
-        self.outputDXFPolyLines = IntVar()
+        self.outputDXFPolyLines = tk.IntVar()
         self.outputDXFPolyLines.set(1)
 
-        self.outputCircles = IntVar()
+        self.outputCircles = tk.IntVar()
         self.outputCircles.set(0)
 
-        self.outputPoints = IntVar()
+        self.outputPoints = tk.IntVar()
         self.outputPoints.set(1)
 
-        self.outputPointsNum = StringVar()
+        self.outputPointsNum = tk.StringVar()
         self.outputPointsNum.set("16")
 
-        self.outputFolder = StringVar()
+        self.outputFolder = tk.StringVar()
         self.outputFolder.set("./")
 
         self.title("Maximum Inscribed Circle")
@@ -120,35 +120,38 @@ class Gui(Tk):
         MenuBar(self, self.quit)
 
         mainframe = ttk.Frame(self, padding=(3, 3, 0, 0))
-        mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
+        mainframe.grid(column=0, row=0, sticky="NESW")
         # Clear focus from text boxes on click
         mainframe.bind("<1>", lambda event: mainframe.focus_set())
 
+        # TODO(Derek): Not sure how to set correct minsizes
+        # Uses 3 columns
         self.initLoad(mainframe, 1)
-        mainframe.columnconfigure(1, weight=0, uniform="a")
+        mainframe.columnconfigure(1, weight=1)
+        mainframe.columnconfigure(2, weight=0)
+        mainframe.columnconfigure(3, weight=1)
 
-        ttk.Separator(mainframe, orient=VERTICAL)\
-            .grid(column=2, row=0, rowspan=30, padx=5, pady=(0, 5), sticky=(N, S))
+        ttk.Separator(mainframe, orient="vertical")\
+            .grid(column=4, row=0, rowspan=30, padx=5, pady=(0, 5), sticky="NS")
         mainframe.rowconfigure(29, weight=1)
 
-        self.initSave(mainframe, 3)
-        mainframe.columnconfigure(3, weight=0, minsize=15)
-        mainframe.columnconfigure(4, weight=1, uniform="a")
-
+        # Uses 2 columns
+        self.initSave(mainframe, 5)
+        mainframe.columnconfigure(5, weight=0, minsize=15)
+        mainframe.columnconfigure(6, weight=2)
 
     def initLoad(self, parentFrame, column):
         self.loadButton = ttk.Button(parentFrame, text="Open csv file/s", command=self.load)
-        self.loadButton.grid(column=column, row=4)
+        self.loadButton.grid(column=column, row=0, padx=5, pady=5)
 
-        ttk.Label(parentFrame, text="Number of polygons found in the file:")\
-            .grid(column=column, row=6, padx=5, pady=0)
+        ttk.Label(parentFrame, text="Number of polygons found:")\
+            .grid(column=column+1, row=0, sticky="E", padx=(5, 0), pady=0)
         ttk.Label(parentFrame, textvariable=self.numPolygons)\
-            .grid(column=column, row=7, padx=5, pady=0)
-        # TODO: add picture of polygons and circles?
+            .grid(column=column+2, row=0, sticky="W", padx=(0, 5), pady=0)
 
     def initSave(self, parentFrame, column):
         ttk.Checkbutton(parentFrame, text="Output to DXF", variable=self.outputDXF, command=self.disableDXF)\
-            .grid(column=column, row=0, columnspan=2, sticky=W, padx=5, pady=(5, 0))
+            .grid(column=column, row=0, columnspan=2, sticky="W", padx=5, pady=(5, 0))
 
         self.dxfCheckButtons = []
         self.dxfCheckButtons.append(ttk.Checkbutton(parentFrame, text="Output Circle in DXF", variable=self.outputDXFCircle))
@@ -157,24 +160,24 @@ class Gui(Tk):
         self.dxfCheckButtons.append(ttk.Checkbutton(parentFrame, text="Output Points in DXF", variable=self.outputDXFPoints, command=self.disablePointsNum))
         self.dxfCheckButtons.append(ttk.Checkbutton(parentFrame, text="Output PolyLine in DXF", variable=self.outputDXFPolyLines, command=self.disablePointsNum))
         for i, button in enumerate(self.dxfCheckButtons):
-            button.grid(column=column+1, row=i+1, sticky=W, padx=5, pady=0)
+            button.grid(column=column+1, row=i+1, sticky="W", padx=5, pady=0)
 
         ttk.Checkbutton(parentFrame, text="Output to Circles csv", variable=self.outputCircles)\
-            .grid(column=column, row=6, columnspan=2, sticky=W, padx=5, pady=5)
+            .grid(column=column, row=6, columnspan=2, sticky="W", padx=5, pady=5)
 
         ttk.Checkbutton(parentFrame, text="Output to Points csv", variable=self.outputPoints, command=self.disablePointsNum)\
-            .grid(column=column, row=7, columnspan=2, sticky=W, padx=5, pady=5)
+            .grid(column=column, row=7, columnspan=2, sticky="W", padx=5, pady=5)
 
         ttk.Label(parentFrame, text="Number of points on circle:")\
-            .grid(column=column, row=8, columnspan=2, sticky=W, padx=5, pady=(5, 0))
+            .grid(column=column, row=8, columnspan=2, sticky="W", padx=5, pady=(5, 0))
 
         self.pointsNumCheckButton = NumEntry(4, 3, 9999, parentFrame, textvariable=self.outputPointsNum)
-        self.pointsNumCheckButton.grid(column=column, row=9, columnspan=2, sticky=W, padx=5, pady=0)
+        self.pointsNumCheckButton.grid(column=column, row=9, columnspan=2, sticky="W", padx=5, pady=0)
 
         ttk.Label(parentFrame, text="Output Folder:")\
-            .grid(column=column, row=10, columnspan=2, sticky=W, padx=5, pady=(5, 0))
+            .grid(column=column, row=10, columnspan=2, sticky="W", padx=5, pady=(5, 0))
         ttk.Entry(parentFrame, textvariable=self.outputFolder)\
-            .grid(column=column, row=11, columnspan=2, sticky=(W, E), padx=5, pady=0)
+            .grid(column=column, row=11, columnspan=2, sticky="EW", padx=5, pady=0)
 
         self.browseButton = ttk.Button(parentFrame, text="Browse", command=self.browse)
         self.browseButton.grid(column=column, row=14, columnspan=2, padx=5, pady=(5, 0))
