@@ -149,6 +149,13 @@ class Gui(tk.Tk):
         ttk.Label(parentFrame, textvariable=self.numPolygons)\
             .grid(column=column+2, row=0, sticky="W", padx=(0, 5), pady=0)
 
+
+        ttk.Label(parentFrame, text="Preview of polygons and output circles:", anchor="center")\
+            .grid(column=column, columnspan=3, row=2, sticky="EW", padx=5, pady=0)
+        self.canvas = tk.Canvas(parentFrame)
+        self.canvas.grid(column=column, columnspan=3, row=3, rowspan=27, sticky="NESW", padx=(10, 5), pady=(0, 10))
+        self.canvas.bind("<Configure>", self.drawShapes)
+
     def initSave(self, parentFrame, column):
         ttk.Checkbutton(parentFrame, text="Output to DXF", variable=self.outputDXF, command=self.disableDXF)\
             .grid(column=column, row=0, columnspan=2, sticky="W", padx=5, pady=(5, 0))
@@ -225,6 +232,78 @@ class Gui(tk.Tk):
 
         self.numPolygons.set(len(polygons))
         self.saveButton.state(["!disabled"])
+
+        self.drawShapes()
+
+    def drawShapes(self, _=None):
+        # Bound to self.canvas resize event
+        # _ argument to allow being used as resize callback
+        if self.polygons:
+            # Clear the canvas before drawing new shapes
+            self.canvas.delete("all")
+
+            colours = ["#e6194B", "#3cb44b", "#ffe119", "#4363d8", "#f58231",
+                       "#42d4f4", "#f032e6", "#fabebe", "#469990", "#e6beff",
+                       "#9A6324", "#fffac8", "#800000", "#aaffc3", "#000075",
+                       "#a9a9a9", "#000000"]
+
+            xMin = inf
+            xMax = 0
+            yMin = inf
+            yMax = 0
+
+            # Polygon max and mins
+            for polygon in self.polygons:
+                for point in polygon[0]:
+                    if point[0] < xMin:
+                        xMin = point[0]
+                    if point[0] > xMax:
+                        xMax = point[0]
+                    if point[1] < yMin:
+                        yMin = point[1]
+                    if point[1] > yMax:
+                        yMax = point[1]
+
+            canvasWidth = self.canvas.winfo_width()
+            canvasHeight = self.canvas.winfo_height()
+
+            # Flip y-axis because origin of canvas is top left
+            xCanvasMin = 10
+            xCanvasMax = canvasWidth  - 10
+            yCanvasMin = canvasHeight - 10
+            yCanvasMax = 10
+
+            xScale = (xCanvasMax-xCanvasMin)/(xMax-xMin)
+            yScale = (yCanvasMin-yCanvasMax)/(yMax-yMin)
+
+            if xScale < yScale:
+                scale = xScale
+                # Centre vertically
+                yCanvasMin -= (canvasHeight - scale*(yMax-yMin)) / 2.0
+            else:
+                scale = yScale
+                # Centre horizontally
+                xCanvasMin += (canvasWidth - scale*(xMax-xMin)) / 2.0
+
+            for i, polygon in enumerate(self.polygons):
+                scaledPoints = []
+                for point in polygon[0]:
+                    scaledPoints.append((point[0]-xMin)*scale + xCanvasMin)
+                    scaledPoints.append((point[1]-yMin)*-scale + yCanvasMin)
+                self.canvas.create_polygon(scaledPoints, fill="", outline=colours[i%len(colours)], width=1)
+
+            for i, circle in enumerate(self.circles):
+                radius = circle[1]
+                x = (circle[0][0]-xMin)*scale + xCanvasMin
+                y = (circle[0][1]-yMin)*-scale + yCanvasMin
+
+                x1 = (circle[0][0]-radius-xMin)*scale + xCanvasMin
+                x2 = (circle[0][0]+radius-xMin)*scale + xCanvasMin
+                y1 = (circle[0][1]-radius-yMin)*-scale + yCanvasMin
+                y2 = (circle[0][1]+radius-yMin)*-scale + yCanvasMin
+
+                self.canvas.create_oval(x, y, x, y, outline=colours[i%len(colours)])
+                self.canvas.create_oval(x1, y1, x2, y2, outline=colours[i%len(colours)])
 
     def browse(self):
         # Bound to browse_button
