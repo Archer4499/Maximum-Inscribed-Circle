@@ -10,6 +10,14 @@ from tkinter import ttk, filedialog, messagebox
 from ezdxf.r12writer import r12writer
 from polylabel import polylabel
 
+# Use Windows high DPI scaling
+if sys.platform == 'win32':
+    try:
+        from ctypes import OleDLL
+        OleDLL('shcore').SetProcessDpiAwareness(1)
+    except (ImportError, AttributeError, OSError):
+        pass
+
 
 class MenuBar(Menu):
     def __init__(self, root, close):
