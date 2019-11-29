@@ -2,7 +2,7 @@
 
 # Requires Python 3.6 and above
 
-from os import chdir
+from os import chdir, makedirs
 from math import pi, sin, cos
 from tkinter import *  # pylint: disable=W0401,W0614
 from tkinter import ttk, filedialog, messagebox
@@ -214,7 +214,6 @@ class Gui(Tk):
 
     def save(self):
         # Bound to saveButton
-        # TODO(Derek): create folder if not existing?
         dxfFileName = "circles.dxf"
         circlesFileName = "circles.csv"
         pointsFileName = "points.csv"
@@ -222,8 +221,16 @@ class Gui(Tk):
         if not self.outputFolder.get():
             messagebox.showerror(title="Error", message="Output Folder not set.")
             return
-        if self.outputFolder.get()[-1] != "/":
-            self.outputFolder.set(self.outputFolder.get()+"/")
+        try:
+            if self.outputFolder.get()[-1] != "/":
+                makedirs(self.outputFolder.get(), exist_ok=True)
+                self.outputFolder.set(self.outputFolder.get()+"/")
+            else:
+                makedirs(self.outputFolder.get()[:-1], exist_ok=True)
+        except OSError:
+            messagebox.showerror(title="Error", message=f"Output Folder: {self.outputFolder.get()} is not able to be created.")
+            return
+
 
         if self.outputPoints.get() or self.outputDXFPoints.get() or self.outputDXFPolyLines.get():
             if int(self.outputPointsNum.get()) < 3:
