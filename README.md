@@ -1,6 +1,6 @@
 # Maximum Inscribed Circle
 
-Reads CSV files from GEM4D and outputs the co-ordinates and diameter (and optionally points of the circle) of a maximum inscribed circle to be contained within a digitized polygon
+Reads CSV files from GEM4D and outputs the co-ordinates and diameter (and optionally points of the circle) of a maximum inscribed circle to be contained within a digitized polygon.
 
 
 ## Getting Started:
@@ -61,7 +61,7 @@ Run the following in a console to install the required packages (replace `python
 python3 -m pip install ezdxf
 ```
 
-Either download and extract the repository zip file or just main.py and polylabel.py (and optionally exampleData.csv), and run the following in a console to start the program:
+Either download and extract the repository zip file or just main.py and polylabel.py (and optionally exampleData.csv), and either double-click main.py if using Windows or run the following in a console to start the program:
 ```
 python3 main.py
 ```
