@@ -38,6 +38,45 @@ class MenuBar(Menu):
         root.config(menu=self)
 
 
+class NumEntry(ttk.Spinbox):
+    # A number validated Spinbox
+    def __init__(self, length, min_val, max_val, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.length = length
+        self.min_val = min_val
+        self.max_val = max_val
+        self.default_val = self.get()
+        self.configure(from_=self.min_val, to=self.max_val, width=self.length + 1, validate="all",
+                       validatecommand=(self.register(self.on_validate), "%P", "%d", "%V"))
+
+    def on_validate(self, new_value, action_type, validate_type):
+        if validate_type == "key":
+            # Don't validate if action is delete
+            if action_type != "0" and new_value.strip() != "":
+                try:
+                    value = int(new_value)
+                except ValueError:
+                    self.bell()
+                    return False
+        elif validate_type == "focusout":
+            try:
+                value = int(new_value)
+                if value < self.min_val:
+                    self.bell()
+                    self.set(self.min_val)
+                    return False
+                if value > self.max_val:
+                    self.bell()
+                    self.set(self.max_val)
+                    return False
+            except ValueError:
+                self.bell()
+                self.set(self.default_val)
+                return False
+
+        return True
+
+
 class Gui(Tk):
     def __init__(self):
         super().__init__()
@@ -95,43 +134,6 @@ class Gui(Tk):
         mainframe.columnconfigure(3, weight=0, minsize=15)
         mainframe.columnconfigure(4, weight=1, uniform="a")
 
-    class NumEntry(ttk.Spinbox):
-        # A number validated Spinbox
-        def __init__(self, length, min_val, max_val, *args, **kwargs):
-            super().__init__(*args, **kwargs)
-            self.length = length
-            self.min_val = min_val
-            self.max_val = max_val
-            self.default_val = self.get()
-            self.configure(from_=self.min_val, to=self.max_val, width=self.length + 1, validate="all",
-                           validatecommand=(self.register(self.on_validate), "%P", "%d", "%V"))
-
-        def on_validate(self, new_value, action_type, validate_type):
-            if validate_type == "key":
-                # Don't validate if action is delete
-                if action_type != "0" and new_value.strip() != "":
-                    try:
-                        value = int(new_value)
-                    except ValueError:
-                        self.bell()
-                        return False
-            elif validate_type == "focusout":
-                try:
-                    value = int(new_value)
-                    if value < self.min_val:
-                        self.bell()
-                        self.set(self.min_val)
-                        return False
-                    if value > self.max_val:
-                        self.bell()
-                        self.set(self.max_val)
-                        return False
-                except ValueError:
-                    self.bell()
-                    self.set(self.default_val)
-                    return False
-
-            return True
 
     def initLoad(self, parentFrame, column):
         self.loadButton = ttk.Button(parentFrame, text="Open csv file/s", command=self.load)
@@ -165,7 +167,7 @@ class Gui(Tk):
         ttk.Label(parentFrame, text="Number of points on circle:")\
             .grid(column=column, row=8, columnspan=2, sticky=W, padx=5, pady=(5, 0))
 
-        self.pointsNumCheckButton = self.NumEntry(4, 3, 9999, parentFrame, textvariable=self.outputPointsNum)
+        self.pointsNumCheckButton = NumEntry(4, 3, 9999, parentFrame, textvariable=self.outputPointsNum)
         self.pointsNumCheckButton.grid(column=column, row=9, columnspan=2, sticky=W, padx=5, pady=0)
 
         ttk.Label(parentFrame, text="Output Folder:")\
