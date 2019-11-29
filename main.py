@@ -51,7 +51,7 @@ class Gui(Tk):
         self.outputDXF = IntVar()
         self.outputDXF.set(1)
         self.outputDXFCircle = IntVar()
-        self.outputDXFCircle.set(1)
+        self.outputDXFCircle.set(0)
         self.outputDXFDiameter = IntVar()
         self.outputDXFDiameter.set(1)
         self.outputDXFLabel = IntVar()
@@ -59,19 +59,19 @@ class Gui(Tk):
         self.outputDXFPoints = IntVar()
         self.outputDXFPoints.set(0)
         self.outputDXFPolyLines = IntVar()
-        self.outputDXFPolyLines.set(0)
+        self.outputDXFPolyLines.set(1)
 
         self.outputCircles = IntVar()
         self.outputCircles.set(0)
 
         self.outputPoints = IntVar()
-        self.outputPoints.set(0)
+        self.outputPoints.set(1)
+
         self.outputPointsNum = StringVar()
         self.outputPointsNum.set("16")
 
         self.outputFolder = StringVar()
         self.outputFolder.set("./")
-
 
         self.title("Maximum Inscribed Circle")
         self.columnconfigure(0, weight=1)
@@ -83,7 +83,6 @@ class Gui(Tk):
         mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
         # Clear focus from text boxes on click
         mainframe.bind("<1>", lambda event: mainframe.focus_set())
-
 
         self.initLoad(mainframe, 1)
         mainframe.columnconfigure(1, weight=0, uniform="a")
