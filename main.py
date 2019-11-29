@@ -123,31 +123,29 @@ class Gui(Tk):
         # TODO: add picture of polygons and circles?
 
     def initSave(self, parentFrame, column):
-        ttk.Checkbutton(parentFrame, text="Output to DXF", variable=self.outputDXF)\
+        ttk.Checkbutton(parentFrame, text="Output to DXF", variable=self.outputDXF, command=self.disableDXF)\
             .grid(column=column, row=0, columnspan=2, sticky=W, padx=5, pady=(5, 0))
-        # TODO: disable these when dxf is unchecked
-        ttk.Checkbutton(parentFrame, text="Output Circle in DXF", variable=self.outputDXFCircle)\
-            .grid(column=column+1, row=1, sticky=W, padx=5, pady=0)
-        ttk.Checkbutton(parentFrame, text="Output Diameter Line in DXF", variable=self.outputDXFDiameter)\
-            .grid(column=column+1, row=2, sticky=W, padx=5, pady=0)
-        ttk.Checkbutton(parentFrame, text="Output Diameter Label in DXF", variable=self.outputDXFLabel)\
-            .grid(column=column+1, row=3, sticky=W, padx=5, pady=0)
-        ttk.Checkbutton(parentFrame, text="Output Points in DXF", variable=self.outputDXFPoints)\
-            .grid(column=column+1, row=4, sticky=W, padx=5, pady=0)
-        ttk.Checkbutton(parentFrame, text="Output PolyLine in DXF", variable=self.outputDXFPolyLines)\
-            .grid(column=column+1, row=5, sticky=W, padx=5, pady=0)
+
+        self.dxfCheckButtons = []
+        self.dxfCheckButtons.append(ttk.Checkbutton(parentFrame, text="Output Circle in DXF", variable=self.outputDXFCircle))
+        self.dxfCheckButtons.append(ttk.Checkbutton(parentFrame, text="Output Diameter Line in DXF", variable=self.outputDXFDiameter))
+        self.dxfCheckButtons.append(ttk.Checkbutton(parentFrame, text="Output Diameter Label in DXF", variable=self.outputDXFLabel))
+        self.dxfCheckButtons.append(ttk.Checkbutton(parentFrame, text="Output Points in DXF", variable=self.outputDXFPoints, command=self.disablePointsNum))
+        self.dxfCheckButtons.append(ttk.Checkbutton(parentFrame, text="Output PolyLine in DXF", variable=self.outputDXFPolyLines, command=self.disablePointsNum))
+        for i, button in enumerate(self.dxfCheckButtons):
+            button.grid(column=column+1, row=i+1, sticky=W, padx=5, pady=0)
 
         ttk.Checkbutton(parentFrame, text="Output to Circles csv", variable=self.outputCircles)\
             .grid(column=column, row=6, columnspan=2, sticky=W, padx=5, pady=5)
 
-        ttk.Checkbutton(parentFrame, text="Output to Points csv", variable=self.outputPoints)\
+        ttk.Checkbutton(parentFrame, text="Output to Points csv", variable=self.outputPoints, command=self.disablePointsNum)\
             .grid(column=column, row=7, columnspan=2, sticky=W, padx=5, pady=5)
 
         ttk.Label(parentFrame, text="Number of points on circle:")\
             .grid(column=column, row=8, columnspan=2, sticky=W, padx=5, pady=(5, 0))
-        # TODO: disable when neither output points in DXF or output points csv are selected
-        self.NumEntry(4, 0, 9999, parentFrame, textvariable=self.outputPointsNum)\
-            .grid(column=column, row=9, columnspan=2, sticky=W, padx=5, pady=0)
+
+        self.pointsNumCheckButton = self.NumEntry(4, 0, 9999, parentFrame, textvariable=self.outputPointsNum)
+        self.pointsNumCheckButton.grid(column=column, row=9, columnspan=2, sticky=W, padx=5, pady=0)
 
         ttk.Label(parentFrame, text="Output Folder:")\
             .grid(column=column, row=10, columnspan=2, sticky=W, padx=5, pady=(5, 0))
@@ -160,6 +158,20 @@ class Gui(Tk):
         self.saveButton = ttk.Button(parentFrame, text="Save", command=self.save)
         self.saveButton.grid(column=column, row=15, columnspan=2, padx=5, pady=(0, 5))
         self.saveButton.state(["disabled"])
+
+    def disableDXF(self):
+        if self.outputDXF.get():
+            for button in self.dxfCheckButtons:
+                button.state(["!disabled"])
+        else:
+            for button in self.dxfCheckButtons:
+                button.state(["disabled"])
+        self.disablePointsNum()
+    def disablePointsNum(self):
+        if self.outputPoints.get() or self.outputDXF.get() and (self.outputDXFPoints.get() or self.outputDXFPolyLines.get()):
+            self.pointsNumCheckButton.state(["!disabled"])
+        else:
+            self.pointsNumCheckButton.state(["disabled"])
 
     def load(self):
         # Bound to loadButton
