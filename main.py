@@ -194,6 +194,7 @@ class Gui(tk.Tk):
         self.saveButton.state(["disabled"])
 
     def disableDXF(self):
+        # Bound to dxf CheckButton
         if self.outputDXF.get():
             for button in self.dxfCheckButtons:
                 button.state(["!disabled"])
@@ -202,6 +203,7 @@ class Gui(tk.Tk):
                 button.state(["disabled"])
         self.disablePointsNum()
     def disablePointsNum(self):
+        # Bound to CheckButtons related to pointsNumCheckButton
         if self.outputPoints.get() or self.outputDXF.get() and (self.outputDXFPoints.get() or self.outputDXFPolyLines.get()):
             self.pointsNumCheckButton.state(["!disabled"])
         else:
