@@ -5,13 +5,14 @@
 from os import chdir, makedirs
 from math import pi, sin, cos
 from tkinter import *  # pylint: disable=W0401,W0614
+from sys import platform
 from tkinter import ttk, filedialog, messagebox
 # import threading  # TODO: possibly use
 from ezdxf.r12writer import r12writer
 from polylabel import polylabel
 
 # Use Windows high DPI scaling
-if sys.platform == 'win32':
+if platform == 'win32':
     try:
         from ctypes import OleDLL
         OleDLL('shcore').SetProcessDpiAwareness(1)
