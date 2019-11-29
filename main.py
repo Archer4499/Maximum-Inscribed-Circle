@@ -86,9 +86,14 @@ class Gui(Tk):
 
         self.initLoad(mainframe, 1)
         mainframe.columnconfigure(1, weight=0, uniform="a")
-        self.initSave(mainframe, 2)
-        mainframe.columnconfigure(2, weight=0, minsize=15)
-        mainframe.columnconfigure(3, weight=1, uniform="a")
+
+        ttk.Separator(mainframe, orient=VERTICAL)\
+            .grid(column=2, row=0, rowspan=30, padx=5, pady=(0, 5), sticky=(N, S))
+        mainframe.rowconfigure(29, weight=1)
+
+        self.initSave(mainframe, 3)
+        mainframe.columnconfigure(3, weight=0, minsize=15)
+        mainframe.columnconfigure(4, weight=1, uniform="a")
 
     class NumEntry(ttk.Spinbox):
         # A number validated Spinbox
