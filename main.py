@@ -447,70 +447,85 @@ class Gui(tk.Tk):
 
 
 def parseData(fileName):
-    # Parses data from the file fileName of either a basic csv format:
-        # poly1Point1X,poly1Point1Y,poly1Point1Z
-        # poly1Point2X,poly1Point2Y,poly1Point2Z
-        #
-        # poly2Point1X,poly2Point1Y,poly2Point1Z
-    # Or approximately the csv format GEM4D outputs, main requirements are:
-        # At least one line with no numbers separating each polygon
+    # Parses data from the file fileName in the CSV format GEM4D outputs
+    # And attempts to parse similar CSV files, main requirements are:
+        # At least one line, without 3 consecutive numbers, separating each polygon
         # Comma separated values
         # 3 consecutive numbers on each polygon line interpreted as x,y,z
     polygons = []
     try:
         with open(fileName, "r") as f:
-            points = []
-            elevations = []
-
             firstLine = f.readline()
             if not firstLine:
-                messagebox.showerror(title="Error", message=f"Tried reading empty file: {fileName}")
+                messagebox.showerror(title="Error", message=f"File: {fileName} is empty")
                 return []
             # Reset position in file to beginning after reading first line
             f.seek(0)
 
+            points = []
+            elevations = []
+
+            columns = []
             firstToken = firstLine.split(",")[0]
 
-            # Check if the first token is a number, if so then it's probably in basic format
-            try:
-                float(firstToken)
+            # Check for GEM4D format
+            if firstToken == "DHid":
+                columns = [1, 2, 3]
+            # TODO(Derek): Add other formats
+            # elif firstToken == "???":
+            #     columns = [0, 1, 2]
+            else:
+                # TODO(Derek): give option of specifying columns
+                # TODO(Derek): checkbox to allow temp suppress warning? (while program still open)
+                messagebox.showwarning(title="Warning", message=f"\"{fileName}\" not in recognised format, attempting to parse anyway.")
+
+
+            if columns:
+                # Parse columns given in columns[]
                 for line in f:
-                    # If blank line, move onto next polygon
-                    if line.strip() == "":
-                        if points:
-                            if len(points) < 3:
-                                messagebox.showerror(title="Error", message=f"Not enough points in number {len(polygons)} polygon in file: {fileName}")
-                                return []
-                            polygons.append([points, elevations])
-                        points = []
-                        elevations = []
-                    else:
-                        point = [float(num) for num in line.split(",")]
-                        points.append(point[0:2])
-                        elevations.append(point[2])
+                    tokens = line.split(",")
+
+                    # Make sure the line as at least as many tokens as required
+                    if len(tokens) >= max(columns):
+                        try:
+                            x = float(tokens[columns[0]])
+                            y = float(tokens[columns[1]])
+                            z = float(tokens[columns[2]])
+                            points.append([x, y])
+                            elevations.append(z)
+                            continue  # for line in f
+                        except ValueError:
+                            pass
+
+                    # If either empty line or floats can't be found in specified columns treat as end of polygon
+                    if points:
+                        if len(points) < 3:
+                            messagebox.showerror(title="Error", message=f"Not enough points in number {len(polygons)} polygon in file: {fileName}")
+                            return []
+                        polygons.append([points, elevations])
+                    points = []
+                    elevations = []
                 if points:
                     if len(points) < 3:
                         messagebox.showerror(title="Error", message=f"Not enough points in number {len(polygons)} polygon in file: {fileName}")
                         return []
                     polygons.append([points, elevations])
-            except ValueError:
-                # If not, check if first token is "DHid", if so then probably GEM4D csv file
-                # If not, then try to parse as a GEM4D csv file and show warning.
-
-                if firstToken != "DHid":
-                    messagebox.showwarning(title="Warning", message=f"{fileName} not in recognised format, trying to parse as GEM4D output.")
-
+            else:
+                # Attempt to parse unknown format
                 for line in f:
                     tokens = line.split(",")
 
                     # Searches the line for a group of 3 consecutive numbers
                     for i in range(len(tokens)-2):
                         try:
-                            points.append([float(tokens[i]), float(tokens[i+1])])
-                            elevations.append(float(tokens[i+2]))
+                            x = float(tokens[i])
+                            y = float(tokens[i+1])
+                            z = float(tokens[i+2])
+                            points.append([x, y])
+                            elevations.append(z)
                             break
                         except ValueError:
-                            continue
+                            pass
                     else:
                         # If line is either too short or doesn't contain 3 floats,
                         #   then it counts as an empty line and we move onto the next polygon
@@ -526,6 +541,7 @@ def parseData(fileName):
                         messagebox.showerror(title="Error", message=f"Not enough points in number {len(polygons)} polygon in file: {fileName}")
                         return []
                     polygons.append([points, elevations])
+
     except OSError:
         messagebox.showerror(title="Error", message=f"Could not open input file: {fileName}")
         return []
