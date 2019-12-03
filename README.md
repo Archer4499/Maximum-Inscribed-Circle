@@ -21,6 +21,8 @@ poly2Point2X,poly2Point2Y,poly2Point2Z
 poly2Point3X,poly2Point3Y,poly2Point3Z
 ```
 
+The program then shows a preview of the imported polygons and their maximum inscribed circles that will be saved.
+
 The following output options can be specified and will output files to the folder specified (The default output folder "./" is the folder that the program is running in):
 * `Output to DXF` will output a file called `circles.dxf`, with each of the circles on a separate numbered layer, starting at `Circle0`.
     * `Output Circle in DXF` adds the maximum inscribed circles defined as circles to the DXF file.
