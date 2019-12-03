@@ -225,8 +225,14 @@ class Gui(tk.Tk):
         circles = []
 
         for polygon in polygons:
+            # TODO(Derek): polylabel sometimes infinite loops if bad data is given
+            #               contained multiple polygons in one, with 0, 0 in between.
             # circle is formatted as [[x,y,z],radius]
             circle = list(polylabel(polygon[0], precision=0.001, with_distance=True))
+            if not circle[1]:
+                prettyPolygon = [[polygon[0][i][0], polygon[0][i][1], polygon[1][i]] for i in range(len(polygon[0]))]
+                messagebox.showerror(title="Error", message=f"Could not create circle from polygon:\n{prettyPolygon}")
+                return
             circle[0].append(sum(polygon[1])/len(polygon[1]))
             circles.append(circle)
 
