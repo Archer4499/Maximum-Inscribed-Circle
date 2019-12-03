@@ -7,7 +7,6 @@ from sys import platform
 from math import pi, sin, cos, inf
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
-# import threading  # TODO: possibly use
 from ezdxf.r12writer import r12writer
 from polylabel import polylabel
 
@@ -119,7 +118,7 @@ class Gui(tk.Tk):
 
         MenuBar(self, self.quit)
 
-        mainframe = ttk.Frame(self, padding=(3, 3, 0, 0))
+        mainframe = ttk.Frame(self)
         mainframe.grid(column=0, row=0, sticky="NESW")
         # Clear focus from text boxes on click
         mainframe.bind("<1>", lambda event: mainframe.focus_set())
@@ -132,7 +131,7 @@ class Gui(tk.Tk):
         mainframe.columnconfigure(3, weight=1)
 
         ttk.Separator(mainframe, orient="vertical")\
-            .grid(column=4, row=0, rowspan=30, padx=5, pady=(0, 5), sticky="NS")
+            .grid(column=4, row=0, rowspan=30, padx=5, pady=0, sticky="NS")
         mainframe.rowconfigure(29, weight=1)
 
         # Uses 2 columns
@@ -143,6 +142,7 @@ class Gui(tk.Tk):
     def initLoad(self, parentFrame, column):
         self.loadButton = ttk.Button(parentFrame, text="Open csv file/s", command=self.load)
         self.loadButton.grid(column=column, row=0, padx=5, pady=5)
+        self.loadButton.focus_set()
 
         ttk.Label(parentFrame, text="Number of polygons found:")\
             .grid(column=column+1, row=0, sticky="E", padx=(5, 0), pady=0)
@@ -152,7 +152,7 @@ class Gui(tk.Tk):
 
         ttk.Label(parentFrame, text="Preview of polygons and output circles:", anchor="center")\
             .grid(column=column, columnspan=3, row=2, sticky="EW", padx=5, pady=0)
-        self.canvas = tk.Canvas(parentFrame)
+        self.canvas = tk.Canvas(parentFrame, background="white")
         self.canvas.grid(column=column, columnspan=3, row=3, rowspan=27, sticky="NESW", padx=(10, 5), pady=(0, 10))
         self.canvas.bind("<Configure>", self.drawShapes)
 
@@ -202,6 +202,7 @@ class Gui(tk.Tk):
             for button in self.dxfCheckButtons:
                 button.state(["disabled"])
         self.disablePointsNum()
+
     def disablePointsNum(self):
         # Bound to CheckButtons related to pointsNumCheckButton
         if self.outputPoints.get() or self.outputDXF.get() and (self.outputDXFPoints.get() or self.outputDXFPolyLines.get()):
@@ -409,7 +410,6 @@ class Gui(tk.Tk):
             return 1
         return 0
 
-
     def saveCircles(self, outFileNameCircles):
         try:
             with open(outFileNameCircles, "w") as f:
@@ -422,7 +422,6 @@ class Gui(tk.Tk):
             messagebox.showerror(title="Error", message=f"Could not write to output file: {outFileNameCircles}")
             return 1
         return 0
-
 
     def savePoints(self, outFileNamePoints):
         pointsNum = int(self.outputPointsNum.get())
