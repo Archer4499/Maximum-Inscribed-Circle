@@ -21,17 +21,22 @@ if platform == 'win32':
 
 
 class MenuBar(tk.Menu):
-    def __init__(self, root, close):
+    def __init__(self, root):
         super().__init__()
 
         self.option_add("*tearOff", False)
 
         file_menu = tk.Menu(self)
-        file_menu.add_command(label="Exit", command=close)
+        file_menu.add_command(label="Exit", command=root.quit)
 
         help_menu = tk.Menu(self)
+        help_menu.add_command(label="Support", command=lambda: webbrowser.open(r"https://github.com/Archer4499/Maximum-Inscribed-Circle"))
         help_menu.add_command(label="About",
-                              command=lambda: messagebox.showinfo("About", "v1.0"))
+                              command=lambda: messagebox.showinfo("About", "Reads data files containing polygons and outputs the co-ordinates and diameter "
+                                                                           "(and optionally points of the circle) of maximum inscribed circles to be "
+                                                                           "contained within the digitized polygons.\n\n"
+                                                                           "Read more at https://github.com/Archer4499/Maximum-Inscribed-Circle\n\n"
+                                                                           "This project is licensed under the MIT License."))
 
         self.add_cascade(menu=file_menu, label="File")
         self.add_cascade(menu=help_menu, label="Help")
@@ -117,7 +122,7 @@ class Gui(tk.Tk):
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
 
-        MenuBar(self, self.quit)
+        MenuBar(self)
 
         mainframe = ttk.Frame(self)
         mainframe.grid(column=0, row=0, sticky="NESW")
